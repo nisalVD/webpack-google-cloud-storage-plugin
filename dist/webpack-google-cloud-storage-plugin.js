@@ -54,7 +54,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	// import merge from 'lodash.merge';
@@ -82,7 +82,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var recursive = _bluebird2.default.promisify(__webpack_require__(6));
 
-	var pluginName = 'WebpackGoogleCloudStoragePlugin';
+	var pluginName = "WebpackGoogleCloudStoragePlugin";
+
+	function makePublic(storage, bucketName, destinationFilePath) {
+	  storage.bucket("" + bucketName).file(destinationFilePath).makePublic().then(function () {
+	    console.log("gs://" + bucketName + "/" + destinationFilePath + " is now public.");
+	  }).catch(function (err) {
+	    console.error("Failed to make " + destinationFilePath + " public...", err);
+	  });
+	}
+
+	function uploadFile(storage, bucketName, file, destinationFilePath, pub) {
+	  storage.bucket("" + bucketName).upload(file.path, {
+	    gzip: true,
+	    destination: destinationFilePath,
+	    metadata: {
+	      cacheControl: "no-cache"
+	    }
+	  }).then(function () {
+	    console.log("Uploaded " + file.path + " to gs://" + bucketName + "/" + file.path);
+	    if (pub) {
+	      makePublic(storage, bucketName, destinationFilePath);
+	    }
+	  }).catch(function (err) {
+	    return console.error(err);
+	  });
+	}
 
 	var hook = function hook(compiler, cb) {
 	  // new webpack
@@ -91,12 +116,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return;
 	  }
 	  // old webpack
-	  compiler.plugin('after-emit', cb);
+	  compiler.plugin("after-emit", cb);
 	};
 
 	module.exports = function () {
 	  _createClass(WebpackGoogleCloudStoragePlugin, null, [{
-	    key: 'defaultDestinationNameFn',
+	    key: "defaultDestinationNameFn",
 	    value: function defaultDestinationNameFn(file) {
 	      return file.path;
 	    }
@@ -112,12 +137,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 
 	  }, {
-	    key: 'defaultMetadataFn',
+	    key: "defaultMetadataFn",
 	    value: function defaultMetadataFn() /* file */{
 	      return {};
 	    }
 	  }, {
-	    key: 'getAssetFiles',
+	    key: "getAssetFiles",
 	    value: function getAssetFiles(_ref) {
 	      var assets = _ref.assets;
 
@@ -127,13 +152,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return _bluebird2.default.resolve(files);
 	    }
 	  }, {
-	    key: 'handleErrors',
+	    key: "handleErrors",
 	    value: function handleErrors(error, compilation, cb) {
-	      compilation.errors.push(new Error(pluginName + ': ' + error.stack));
+	      compilation.errors.push(new Error(pluginName + ": " + error.stack));
 	      cb();
 	    }
 	  }, {
-	    key: 'schema',
+	    key: "schema",
 	    get: function get() {
 	      return {
 	        directory: _propTypes2.default.string,
@@ -154,9 +179,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    }
 	  }, {
-	    key: 'ignoredFiles',
+	    key: "ignoredFiles",
 	    get: function get() {
-	      return ['.DS_Store'];
+	      return [".DS_Store"];
 	    }
 	  }]);
 
@@ -174,13 +199,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.uploadOptions.destinationNameFn = this.uploadOptions.destinationNameFn || this.constructor.defaultDestinationNameFn;
 	    this.uploadOptions.metadataFn = this.uploadOptions.metadataFn || this.constructor.defaultMetadataFn;
 
-	    this.options = (0, _utils.pick)(options, ['directory', 'include', 'exclude', 'basePath']);
+	    this.options = (0, _utils.pick)(options, ["directory", "include", "exclude", "basePath"]);
 
 	    this.options.exclude = this.options.exclude || [];
 	  }
 
 	  _createClass(WebpackGoogleCloudStoragePlugin, [{
-	    key: 'connect',
+	    key: "connect",
 	    value: function connect() {
 	      if (this.isConnected) {
 	        return;
@@ -190,7 +215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.isConnected = true;
 	    }
 	  }, {
-	    key: 'filterFiles',
+	    key: "filterFiles",
 	    value: function filterFiles(files) {
 	      var _this = this;
 
@@ -199,28 +224,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }));
 	    }
 	  }, {
-	    key: 'isIncluded',
+	    key: "isIncluded",
 	    value: function isIncluded(fileName) {
 	      return this.options.include.some(function (include) {
 	        return fileName.match(new RegExp(include));
 	      });
 	    }
 	  }, {
-	    key: 'isExcluded',
+	    key: "isExcluded",
 	    value: function isExcluded(fileName) {
 	      return this.options.exclude.some(function (exclude) {
 	        return fileName.match(new RegExp(exclude));
 	      });
 	    }
 	  }, {
-	    key: 'isIgnored',
+	    key: "isIgnored",
 	    value: function isIgnored(fileName) {
 	      return this.constructor.ignoredFiles.some(function (ignoredFile) {
 	        return fileName.match(new RegExp(ignoredFile));
 	      });
 	    }
 	  }, {
-	    key: 'handleFiles',
+	    key: "handleFiles",
 	    value: function handleFiles(files) {
 	      var _this2 = this;
 
@@ -229,14 +254,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    }
 	  }, {
-	    key: 'apply',
+	    key: "apply",
 	    value: function apply(compiler) {
 	      var _this3 = this;
 
 	      this.connect();
 
 	      // NOTE: Use specified directory, webpack.config.output or current dir.
-	      this.options.directory = this.options.directory || compiler.options.output.path || compiler.options.output.context || '.';
+	      this.options.directory = this.options.directory || compiler.options.output.path || compiler.options.output.context || ".";
 	      hook(compiler, function (compilation, cb) {
 	        if (_this3.options.directory) {
 	          recursive(_this3.options.directory, _this3.options.exclude).then(function (files) {
@@ -262,24 +287,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    }
 	  }, {
-	    key: 'uploadFiles',
+	    key: "uploadFiles",
 	    value: function uploadFiles() {
 	      var _this4 = this;
 
 	      var files = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-	      var bucket = this.client.bucket(this.uploadOptions.bucketName);
+	      // const bucket = this.client.bucket(this.uploadOptions.bucketName);
 	      // see https://hackernoon.com/concurrency-control-in-promises-with-bluebird-977249520f23
 	      // http://bluebirdjs.com/docs/api/promise.map.html#map-option-concurrency
 	      return _bluebird2.default.map(files, function (file) {
-	        return bucket.upload(file.path, {
-	          destination: _this4.uploadOptions.destinationNameFn(file),
-	          gzip: _this4.uploadOptions.gzip || false,
-	          public: _this4.uploadOptions.makePublic || false,
-	          resumable: _this4.uploadOptions.resumable,
-	          metadata: _this4.uploadOptions.metadataFn(file)
-	        });
-	      }, { concurrency: this.uploadOptions.concurrency || 10 });
+	        return uploadFile(_this4.client, _this4.uploadOptions.bucketName, file, _this4.uploadOptions.destinationNameFn(file),
+	        // file.path,
+	        true);
+	      }
+	      //   bucket.upload(file.path, {
+	      //     destination: this.uploadOptions.destinationNameFn(file),
+	      //     gzip: this.uploadOptions.gzip || false,
+	      //     public: this.uploadOptions.makePublic || false,
+	      //     resumable: this.uploadOptions.resumable,
+	      //     metadata: this.uploadOptions.metadataFn(file)
+	      //   }),
+	      // { concurrency: this.uploadOptions.concurrency || 10 }
+	      );
 	    }
 	  }]);
 

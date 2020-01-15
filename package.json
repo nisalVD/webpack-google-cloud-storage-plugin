@@ -1,15 +1,15 @@
 {
-  "name": "webpack-google-cloud-storage-plugin",
-  "version": "0.9.0",
+  "name": "gcs-webpack-plugin",
+  "version": "0.9.1",
   "description": "A Webpack plugin to upload assets in Google Cloud Storage.",
   "main": "dist/webpack-google-cloud-storage-plugin.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "NODE_ENV=production webpack --config webpack.config.js",
     "prepare": "npm run build",
+    "lint": "eslint --quiet --fix --ext .js .",
     "example": "cd examples && webpack --config webpack.config.js",
     "watch": "webpack --config webpack.config.js --watch",
-    "lint": "eslint --quiet --fix --ext .js .",
     "prep:major": "npm run build && npm version major",
     "prep:minor": "npm run build && npm version minor",
     "prep:patch": "npm run build && npm version patch"
@@ -56,5 +56,8 @@
     "lodash.merge": "^4.6.0",
     "prop-types": "^0.2.0",
     "recursive-readdir": "^2.1.0"
+  },
+  "directories": {
+    "example": "examples"
   }
 }
